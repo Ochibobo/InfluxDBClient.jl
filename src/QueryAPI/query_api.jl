@@ -2,6 +2,7 @@
 QueryAPIClient for read functions related to the InfluxDB Server
 """
 module QueryAPI
+
 using Parameters
 using ..BaseClient
 

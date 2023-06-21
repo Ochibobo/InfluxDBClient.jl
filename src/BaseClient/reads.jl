@@ -2,7 +2,6 @@ import JSON
 """
 """
 const READ_HEADERS = Vector{Pair{String, String}}()
-push!(READ_HEADERS, "Content-Type" => "application/json")
 push!(READ_HEADERS, "Accept" => "application/csv")
 
 
@@ -11,6 +10,7 @@ push!(READ_HEADERS, "Accept" => "application/csv")
 function queryRaw(apiClient::APIClient, url::String, fluxQuery::String)
     _url = apiClient.url * url * "?org=$(apiClient.org)"
     
+    push!(READ_HEADERS, "Content-Type" => "application/vnd.flux")
     push!(READ_HEADERS, "Authorization" => "Token $(apiClient.token)")
 
     try
@@ -36,6 +36,7 @@ See REQUEST BODY SCHEMA section in https://docs.influxdata.com/influxdb/cloud/ap
 function queryWithParams(apiClient::APIClient, url::String, fluxQuery::String, params::Dict; extras::Dict)::DataFrame
     _url = apiClient.url * url * "?org=$(apiClient.org)"
     
+    push!(READ_HEADERS, "Content-Type" => "application/json")
     push!(READ_HEADERS, "Authorization" => "Token $(apiClient.token)")
 
     body = Dict("query" => fluxQuery, "params" => params)
