@@ -21,5 +21,9 @@ using .WriteAPI
 include("QueryAPI/query_api.jl")
 using .QueryAPI
 
+## The DeleteAPI
+include("DeleteAPI/delete_api.jl")
+using .DeleteAPI
+
 end
 

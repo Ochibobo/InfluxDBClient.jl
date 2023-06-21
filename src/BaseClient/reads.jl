@@ -1,11 +1,16 @@
-import JSON
 """
+    const READ_HEADERS = Vector{Pair{String, String}}()
+
+Headers for a read request
 """
 const READ_HEADERS = Vector{Pair{String, String}}()
 push!(READ_HEADERS, "Accept" => "application/csv")
 
 
 """
+    queryRaw(apiClient::APIClient, url::String, fluxQuery::String)
+
+Query using a raw `fluxQuery`.
 """
 function queryRaw(apiClient::APIClient, url::String, fluxQuery::String)
     _url = apiClient.url * url * "?org=$(apiClient.org)"

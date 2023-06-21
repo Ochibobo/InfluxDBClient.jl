@@ -1,6 +1,11 @@
 
 """
-QueryAPI struct
+    mutable struct QueryAPIClient
+        apiClient::APIClient = APIClient()
+        path::String = "/api/v2/query"
+    end
+
+`QueryAPIClient` struct
 """
 @with_kw mutable struct QueryAPIClient
     apiClient::APIClient = APIClient()

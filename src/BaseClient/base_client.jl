@@ -6,8 +6,8 @@ module BaseClient
 using Parameters
 using HTTP
 using CSV
-using DataFrames
 using ..ResponseCodes
+import JSON
 
 export APIClient
 export writeData
@@ -16,7 +16,7 @@ export onSuccess
 export onError
 export queryRaw
 export queryWithParams
-
+export deleteData
 
 """
     @with_kw mutable struct APIClient
@@ -37,6 +37,6 @@ end
 
 include("writes.jl")
 include("reads.jl")
-
+include("deletes.jl")
 
 end
