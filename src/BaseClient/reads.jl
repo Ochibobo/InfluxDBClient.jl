@@ -16,7 +16,7 @@ function queryRaw(apiClient::APIClient, url::String, fluxQuery::String)
     try
         response = HTTP.post(_url, READ_HEADERS, fluxQuery)
         data = response.body
-        return DataFrame(CSV.File(data))
+        return CSV.File(data)
     catch e
         throw(e)
     end
@@ -52,7 +52,7 @@ function queryWithParams(apiClient::APIClient, url::String, fluxQuery::String, p
     try
         response = HTTP.post(_url, READ_HEADERS, JSON.json(body))
         data = response.body
-        return DataFrame(CSV.File(data))
+        return CSV.File(data)
     catch e
         throw(e)
     end
