@@ -152,7 +152,7 @@ end
 `write` function for writing structs vector that conform to the measurement interface API
 """
 function write(writer::WriteAPIClient, bucket::String, s::Vector{T}) where T
-    ilp_str = join("", string.(s))
+    ilp_str = join("", buildRecord.(s))
     write(writer, bucket, ilp_str, precision = writePrecision(T))
 end
 
@@ -193,7 +193,7 @@ end
 Function used to write `asynchronously` to the InfluxDB Server
 """
 function write(writer::AsyncWriteAPIClient, bucket::String, s::T) where T
-    write(writer, bucket, buildRecord(s), precision = writePrecision(T))
+    return write(writer, bucket, buildRecord(s), precision = writePrecision(T))
 end
 
 
