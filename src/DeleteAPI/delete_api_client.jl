@@ -72,9 +72,8 @@ end
 
 
 """
-Examples
-"""
-"""
+Examples:
+
 DeletePredicate(predicate = "room=\"TVRoom\"",
                 start = "2019-08-24T14:15:22Z",
                 stop = "2023-08-24T14:15:22Z")
