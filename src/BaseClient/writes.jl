@@ -29,7 +29,7 @@ const WRITE_ERROR_CHANNEL = Channel{Tuple{Integer, String}}(5000)
 
 Function used to write data to the `InfluxDB` server. An `exception` is thrown if write is not successful.
 """
-function writeData(apiClient::APIClient, url::String, body::String)::Nothing
+function writeData(apiClient::APIClient, url::String, body::String)::Union{HTTP.Response, Nothing}
     ## Append url information to the url
     _url = apiClient.url * url * "&org=$(apiClient.org)"
 
@@ -37,7 +37,7 @@ function writeData(apiClient::APIClient, url::String, body::String)::Nothing
 
     try
         response = HTTP.post(_url, WRITE_HEADERS, body)
-        println(response)
+        return response
     catch e
         ## Execute a retry
         throw(e)
