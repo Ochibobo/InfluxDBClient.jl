@@ -1,3 +1,4 @@
+using HTTP
 """
 Responsible for synchronous writes
 """
@@ -24,11 +25,11 @@ end
         
 `write` to write raw strings to InfluxDB. The underlying write function for all writers
 """
-function write(writer::WriteAPIClient, bucket::String, data::String; precision::WritePrecision = ns)
+function write(writer::WriteAPIClient, bucket::String, data::String; precision::WritePrecision = ns)::Union{HTTP.Response, Nothing}
     url = writer.path * "?bucket=$bucket&precision=$(precision)"
 
     ## Branch on synchronous or asynchronous writeType
-    writeData(apiClient(writer), url, data)
+    return writeData(apiClient(writer), url, data)
 end
 
 
