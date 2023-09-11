@@ -129,7 +129,7 @@ end
 
 Function used to assign multiple `field`s to a `Point` instance
 """
-function addFields!(p::Point, ts::Pair{T, V}...)::Point where {T <: SymbolColumnValue, V}
+function addFields!(p::Point, ts::Pair{T, <: Any}...)::Point where {T <: SymbolColumnValue}
     for t in ts
         p = addField!(p, t)
     end
@@ -290,8 +290,9 @@ end
 `write` function to write a `Vector{Point}` to the database
 """
 function write(writer::WriteAPIClient, bucket::String, points::Vector{Point})
+    isempty(points) && return nothing
     ilp_str = join("\n", string.(points))
-    write(writer, bucket, ilp_str, precision = writePrecision(point)) 
+    write(writer, bucket, ilp_str, precision = writePrecision(points[1])) 
 end
 
 
