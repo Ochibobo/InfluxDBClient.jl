@@ -152,6 +152,7 @@ end
 `write` function for writing structs vector that conform to the measurement interface API
 """
 function write(writer::WriteAPIClient, bucket::String, s::Vector{T}) where T
+    isempty(s) && return nothing
     ilp_str = join("", buildRecord.(s))
     write(writer, bucket, ilp_str, precision = writePrecision(T))
 end
