@@ -57,11 +57,53 @@ writer = WriteAPI.WriteAPIClient()
 
         @test !isnothing(response)
         @test response.status == Int(ResponseCodes.NO_CONTENT)
+
+        response = WriteAPI.write(writer, "airSensors", [])
+        @test isnothing(response)
     end
 
 
     ## Point test
-    
-end
 
-## 
+    ## Macro based Point
+    point1 = WriteAPI.Point() |>
+        WriteAPI.@measurement(:home) |>
+        WriteAPI.@tags(:room => "Bathroom") |>
+        WriteAPI.@fields(:hum => 32.4) |>
+        WriteAPI.@fields(:temp => 24.3) |>
+        WriteAPI.@fields(:co => 0) |>
+        WriteAPI.@timestamp(WriteAPI.Timestamp(Date(2023, 9, 11), WriteAPI.ns))
+
+    ## Function-Based Point
+    point2 = WriteAPI.Point()
+    WriteAPI.setMeasurement!(point2, :home)
+    WriteAPI.addTag!(point2, :room => "Kitchen")
+    WriteAPI.addFields!(point2, :hum => 32.4, :temp => 24.3, :co => 0)
+    WriteAPI.setTimestamp!(point2, WriteAPI.Timestamp(Date(2023, 9, 11), WriteAPI.ns))
+    
+    @testset "Write Single Point Construction" begin
+        @test string(point1) == "home,room=Bathroom hum=32.4,temp=24.3,co=0 1694390400000000000\n"
+        @test string(point2) == "home,room=Kitchen hum=32.4,temp=24.3,co=0 1694390400000000000\n"
+    end
+
+    @testset "Write Single Point To Database" begin
+        response = WriteAPI.write(writer, "airSensors", point1)
+
+        @test !isnothing(response)
+        @test response.status == Int(ResponseCodes.NO_CONTENT)
+
+        response = WriteAPI.write(writer, "airSensors", point2)
+        @test !isnothing(response)
+        @test response.status == Int(ResponseCodes.NO_CONTENT)
+    end
+
+    @testset "Write Multiple Points To Database" begin
+        response = WriteAPI.write(writer, "airSensors", repeat([point1, point2], 5))
+        @test !isnothing(response)
+        @test response.status == Int(ResponseCodes.NO_CONTENT)
+
+        response = WriteAPI.write(writer, "airSensors", [])
+        @test isnothing(response)
+    end
+
+end
