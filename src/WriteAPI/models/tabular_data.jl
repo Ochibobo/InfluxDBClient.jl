@@ -2,6 +2,7 @@
 using Dates
 using Tables
 using Parameters
+using DataFrames
 
 import Base: string
 """
@@ -35,7 +36,7 @@ each row entry of a `TabularData`'s instance.
     measurement::Symbol
     tags::Vector{Symbol}
     fields::Vector{Symbol}
-    excluded::Vector{Symbol}
+    excluded::Vector{Symbol} = []
     timestamp::Symbol
     writePrecision::WritePrecision
 end
@@ -159,7 +160,13 @@ table(t::TabularData) = t.table
 
 Return the number of rows present in the `table` present in the `TabularData`
 """
-table_size(t::TabularData) = length(table(t))
+function table_size(t::TabularData)::Int
+    ## Return the number of rows if the table is a dataframe
+    table(t) isa DataFrame && return size(table(t))[1]
+
+    ## Return length otherwise (other table interfaces use this)
+    return length(table(t))
+end
 
 
 
@@ -282,10 +289,16 @@ function partialString(tabularData::TabularData, start::Integer = 1, batchSize::
     end
 
     ## Convert the indices that are within the scope to an ILP record statement
-    for row in Tables.rows(_table[start: last_index])
-        ilp_str *= row_string(row, schema)
+    if _table isa DataFrame
+        for row in Tables.rows(_table)[start: last_index]
+            ilp_str *= row_string(row, schema)
+        end
+    else
+        for row in Tables.rows(_table[start: last_index])
+            ilp_str *= row_string(row, schema)
+        end
     end
-
+   
     return (last_index + 1, ilp_str)
 end
 
@@ -296,19 +309,25 @@ end
 Function used to batch-write a `TabularData` instance. The size of the batch is determine by the `batchSize` parameter of the 
 `writeOption` object in the `writer`.
 """
-function batchWrite(writer::WriteAPIClient, bucket::String, tabularData::TabularData)
+function batchWrite(writer::WriteAPIClient, bucket::String, tabularData::TabularData)::Vector
     ## Start at index 1
     startIndex = 1
     n = table_size(tabularData)
     ## Fetch the batch size specified in the writer's writeOptions
     batchSize = writer.writeOptions.batchSize
+    ## Responses
+    responses = []
 
     ## Write the batches one at a time
     while startIndex < n
         startIndex, ilp = partialString(tabularData, startIndex, batchSize)
         ## Write the ilp to the server
-        write(writer, bucket, ilp, precision = writePrecision(tabularData))
+        response = write(writer, bucket, ilp, precision = writePrecision(tabularData))
+        ## Add the response to responses
+        push!(responses, response)
     end
+
+    return responses
 end
 
 """
